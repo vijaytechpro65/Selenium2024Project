@@ -31,6 +31,7 @@ public class Constants {
 		    );
 	 public static final int DROPDOWN_COUNT =9;
 	 public static final String REGISTER_SUCCESS_MESSG = "Your Account Has Been Created!";
+	 public static final String LOGIN_PAGE_NEW_CUSTOMER="New Customer";
 		
 
 }

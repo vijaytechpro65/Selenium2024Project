@@ -25,7 +25,7 @@ public class Loginpage {
     private final By registerLink = By.linkText("Register");
     private final By forgottenPasswordLink = By.linkText("Forgotten Password");
     private final By wishListLink = By.partialLinkText("Wish List");
-    
+    private final By NewCoustomerLink =By.xpath("//h2[normalize-space()='New Customer']");
 
 // page actions
    @Step("Register Link is there or not.....")
@@ -51,6 +51,9 @@ public class Loginpage {
     public boolean isWishListLink() {
         return eleutil.doIsDisplayed(wishListLink);
         
+    }
+    public String IsNewCoustomer() {
+    	return eleutil.doGetText(NewCoustomerLink);
     }
 
    

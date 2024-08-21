@@ -5,6 +5,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.qa.opencart.utils.CommonErrors;
+import com.qa.opencart.utils.Constants;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
@@ -43,9 +44,15 @@ public class LoginPageTest extends BaseTest {
     public void testWishListLink() {
         Assert.assertTrue(loginpage.isWishListLink());
     }
+    @Test(priority=6)
+    public void NewCoustomerLinkTest() {
+    	String actval=loginpage.IsNewCoustomer();
+    	Assert.assertEquals(actval, Constants.LOGIN_PAGE_NEW_CUSTOMER);
+    	
+    }
 
    
-    @Test(priority=6)
+    @Test(priority=7)
     public void testDoLogin() {
        accountspage= loginpage.dologin(prop.getProperty("username").trim(), prop.getProperty("password").trim());
       Assert.assertTrue(accountspage.isSearchFieldDisplayed());
