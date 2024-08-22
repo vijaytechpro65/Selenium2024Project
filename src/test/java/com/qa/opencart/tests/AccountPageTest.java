@@ -27,6 +27,10 @@ public class AccountPageTest extends BaseTest {
 	        Assert.assertTrue(actualHeader);
 	    }
 	 @Test
+	    public void verifyAccountLinkWithNormalizeSpace() {
+		Assert.assertTrue(accountspage.getAccountLinkNormalized());
+	 }
+	 @Test
 	    public void verifyTermsAndConditionsLinkTextTest() {
 	        String actualLinkText = accountspage.isTermsAndConditionslink();
 	        Assert.assertEquals(actualLinkText, "Terms & Conditions");
