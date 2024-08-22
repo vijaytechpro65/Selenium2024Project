@@ -30,11 +30,14 @@ public class AccountsPage {
 	private By SearchField=By.xpath("//input[@name='search']");
 	private By button =By.xpath("//button[@type='button' and @class='btn btn-default btn-lg']");
 	private By Mp3players=By.xpath("//a[text()='MP3 Players']");
-	
+	private By AccountOnAcPage=By.xpath("//a[normalize-space()='Account']");
 	//page Actions
 	public String APgetTitle() {
 		return eleutil.waitForTitleToBe(Constants.ACCOUNTS_PAGE_TITLE, Constants.DEFAULT_TIME_OUT);
 	}
+	public boolean getAccountLinkNormalized() {
+        return eleutil.doIsDisplayed(AccountOnAcPage);
+    }
 		
 	public boolean isAccountPageHeaderDisplayed() {
 	    return eleutil.doIsDisplayed(Accountspageheader);
