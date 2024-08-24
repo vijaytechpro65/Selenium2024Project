@@ -15,6 +15,7 @@ import io.qameta.allure.Story;
 @Epic("Epic id in jira 100: Design opencart application- LoginPage")
 @Story("There is a user story under this epic 101:open cart login design with multiple features")
 //@Listeners( TestAllureListener.class)some times the screenshot is not coming you just add this listener above your test class
+
 public class LoginPageTest extends BaseTest {
 	@Description("LoinPage Title Test  ")
 	@Severity(SeverityLevel.MINOR)
