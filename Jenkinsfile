@@ -18,13 +18,6 @@ pipeline {
                 // Run Maven build
                 sh "mvn clean package"
             }
-            post {
-                always {
-                    // Archive TestNG reports and JAR files
-                    junit '**/target/testng-reports/*.xml'
-                    archiveArtifacts 'target/*.jar'
-                }
-            }
         }
         
         stage('Regression Automation Test') {
