@@ -1,65 +1,67 @@
-pipeline 
-{
+pipeline {
     agent any
-    
-    tools{
-    	maven 'maven'
-        }
 
-    stages 
-    {
-        stage('Build') 
-        {
-            steps 
-            {
-                 git 'https://github.com/jglick/simple-maven-project-with-tests.git'
-                 sh "mvn clean package"
+    tools {
+        maven 'maven'  // Ensure Maven is configured in Jenkins Global Tools
+    }
+
+    stages {
+        stage('Checkout PageObjectModel') {
+            steps {
+                // Clone the PageObjectModel repository
+                git 'https://github.com/naveenanimation20/PageObjectModel'
             }
-            post 
-            {
-                success 
-                {
-                    junit '**/target/surefire-reports/TEST-*.xml'
+        }
+        
+        stage('Build') {
+            steps {
+                // Run Maven build
+                sh "mvn clean package"
+            }
+            post {
+                always {
+                    // Archive TestNG reports and JAR files
+                    junit '**/target/testng-reports/*.xml'
                     archiveArtifacts 'target/*.jar'
                 }
             }
         }
         
-        
         stage('Regression Automation Test') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    // Clone the Selenium2024Project repository and run tests
                     git 'https://github.com/vijaytechpro65/Selenium2024Project'
                     sh "mvn clean install"
                 }
             }
         }
                 
-     
         stage('Publish Allure Reports') {
-           steps {
+            steps {
                 script {
                     allure([
                         includeProperties: false,
                         jdk: '',
                         properties: [],
                         reportBuildPolicy: 'ALWAYS',
-                        results: [[path: '/allure-results']]
+                        results: [[path: 'allure-results']]
                     ])
                 }
             }
         }
         
-        
-        stage('Publish Extent Report'){
-            steps{
-                     publishHTML([allowMissing: false,
-                                  alwaysLinkToLastBuild: false, 
-                                  keepAll: false, 
-                                  reportDir: 'build', 
-                                  reportFiles: 'TestExecutionReport.html', 
-                                  reportName: 'HTML Extent Report', 
-                                  reportTitles: ''])
+        stage('Publish Extent Report') {
+            steps {
+                publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: 'build',
+                    reportFiles: 'TestExecutionReport.html',
+                    reportName: 'HTML Extent Report',
+                    reportTitles: ''
+                ])
             }
         }
     }
