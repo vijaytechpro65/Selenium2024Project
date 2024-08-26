@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
@@ -12,8 +14,12 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
@@ -33,7 +39,13 @@ public class DriverFactory {
 		case "chrome":
 			System.setProperty("webdriver.chrome.driver", "C:\\Users\\Vijay\\Downloads\\chromedriver-win64\\chromedriver-win64\\chromedriver.exe");
             // driver = new ChromeDriver(browserOptions.getChromeOptions());
-			 tlDriver.set(new ChromeDriver(browserOptions.getChromeOptions()));
+			if(Boolean.parseBoolean(prop.getProperty("remote"))){
+				init_remotewebdriver("chrome");
+				
+			}else {
+				tlDriver.set(new ChromeDriver(browserOptions.getChromeOptions()));
+			}
+			 
              break;
 			
 		 case "firefox":
@@ -63,10 +75,51 @@ public class DriverFactory {
 	        return getDriver();
 	    }
 		
+		private void init_remotewebdriver(String browser) {
+	    try {
+	        // Load the hub URL from the properties file
+	        String hubUrl = prop.getProperty("huburl");
+
+	        // Validate the hub URL
+	        if (hubUrl == null || hubUrl.isEmpty()) {
+	            throw new IllegalArgumentException("Remote WebDriver URL is not specified in the properties file.");
+	        }
+
+	        // Set up browser-specific options
+	        switch (browser.toLowerCase()) {
+	            case "chrome":
+	                ChromeOptions chromeOptions = browserOptions.getChromeOptions();
+	                tlDriver.set(new RemoteWebDriver(new URL(hubUrl), chromeOptions));
+	                break;
+	                
+	            case "firefox":
+	                FirefoxOptions firefoxOptions = browserOptions.getFirefoxOptions();
+	                tlDriver.set(new RemoteWebDriver(new URL(hubUrl), firefoxOptions));
+	                break;
+	                
+	            case "edge":
+	                EdgeOptions edgeOptions = browserOptions.getEdgeOptions();
+	                tlDriver.set(new RemoteWebDriver(new URL(hubUrl), edgeOptions));
+	                break;
+
+	            // Add more browsers as needed
+
+	            default:
+	                throw new IllegalArgumentException("Browser not supported for remote execution: " + browser);
+	        }
+	    } catch (MalformedURLException e) {
+	        e.printStackTrace();
+	        throw new RuntimeException("The hub URL is malformed: " + prop.getProperty("huburl"), e);
+	    }
+	}
+
 		
 	
-	
-	 public static synchronized WebDriver getDriver() {
+
+
+
+
+	public static synchronized WebDriver getDriver() {
 	        return tlDriver.get();
 	    }
 	
