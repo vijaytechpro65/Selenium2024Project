@@ -2,6 +2,10 @@ package com.qa.opencart.Factory;
 
 
 import java.io.File;
+
+
+
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,7 +20,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -29,15 +32,14 @@ public class DriverFactory {
 	public static String highlight;
 	 BrowserOptions browserOptions;
 	 private static ThreadLocal<WebDriver> tlDriver = new ThreadLocal<>();
-	
 	public WebDriver init_driver(Properties prop) {
-		String browserName=prop.getProperty("browser");
+		String browserName=prop.getProperty("browser").trim();
 		System.out.println("browser name is :"+browserName);
 		highlight=prop.getProperty("highlight");
 		 browserOptions=new  BrowserOptions(prop);
 		switch (browserName.toLowerCase()) {
 		case "chrome":
-			System.setProperty("webdriver.chrome.driver", "C:\\Users\\Vijay\\Downloads\\chromedriver-win64\\chromedriver-win64\\chromedriver.exe");
+			System.setProperty("webdriver.chrome.driver", "C:\\Users\\Vijay\\Downloads\\chromedriver-win64 (1)\\chromedriver-win64\\chromedriver.exe");
             // driver = new ChromeDriver(browserOptions.getChromeOptions());
 			if(Boolean.parseBoolean(prop.getProperty("remote"))){
 				init_remotewebdriver("chrome");
@@ -75,48 +77,34 @@ public class DriverFactory {
 	        return getDriver();
 	    }
 		
-		private void init_remotewebdriver(String browser) {
-	    try {
-	        // Load the hub URL from the properties file
-	        String hubUrl = prop.getProperty("huburl");
+	private void init_remotewebdriver(String browser) {
+	    System.out.println("Running test on remote grid server: " + browser);
+	    
+	    if (browser.equalsIgnoreCase("chrome")) {
+	        ChromeOptions options = new ChromeOptions();
+	        options.addArguments("--remote-allow-origins=*");
+	        // Add any additional Chrome options if needed
+	        // options.addArguments("--headless"); // Example
 
-	        // Validate the hub URL
-	        if (hubUrl == null || hubUrl.isEmpty()) {
-	            throw new IllegalArgumentException("Remote WebDriver URL is not specified in the properties file.");
+	        try {
+	            tlDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")), options));
+	        } catch (MalformedURLException e) {
+	            e.printStackTrace();
 	        }
+	    } else if (browser.equalsIgnoreCase("firefox")) {
+	        FirefoxOptions options = new FirefoxOptions();
+	        // Add any additional Firefox options if needed
+	        // options.setHeadless(true); // Example
 
-	        // Set up browser-specific options
-	        switch (browser.toLowerCase()) {
-	            case "chrome":
-	                ChromeOptions chromeOptions = browserOptions.getChromeOptions();
-	                tlDriver.set(new RemoteWebDriver(new URL(hubUrl), chromeOptions));
-	                break;
-	                
-	            case "firefox":
-	                FirefoxOptions firefoxOptions = browserOptions.getFirefoxOptions();
-	                tlDriver.set(new RemoteWebDriver(new URL(hubUrl), firefoxOptions));
-	                break;
-	                
-	            case "edge":
-	                EdgeOptions edgeOptions = browserOptions.getEdgeOptions();
-	                tlDriver.set(new RemoteWebDriver(new URL(hubUrl), edgeOptions));
-	                break;
-
-	            // Add more browsers as needed
-
-	            default:
-	                throw new IllegalArgumentException("Browser not supported for remote execution: " + browser);
+	        try {
+	            tlDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")), options));
+	        } catch (MalformedURLException e) {
+	            e.printStackTrace();
 	        }
-	    } catch (MalformedURLException e) {
-	        e.printStackTrace();
-	        throw new RuntimeException("The hub URL is malformed: " + prop.getProperty("huburl"), e);
+	    } else {
+	        throw new IllegalArgumentException("Browser not supported: " + browser);
 	    }
 	}
-
-		
-	
-
-
 
 
 	public static synchronized WebDriver getDriver() {
